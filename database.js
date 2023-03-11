@@ -1,8 +1,8 @@
 //import { mysql_user, mysql_pass, mysql_db } from '/env/credentials.js';
 //let mysql = require('mysql')
-import * as mysql from "mysql"
+const mysql = require("mysql")
 
-export class Database
+class Database
 {
   constructor() {
       this.connection = mysql.createConnection({
@@ -74,6 +74,8 @@ export class Database
     }) 
   }
 }
+
+module.exports = Database
 /*
 const db = new Database()
 db.isConnected()
