@@ -3,6 +3,11 @@ const input_case = {
   textarea: 'textarea',
 }
 
+/**
+ * 
+ * @description Sanitize an input by providing the text to the input parameter,
+ * along with a relevant case: ie. sanitize.input(text, Sanitize.input_case.input)
+ */
 class Sanitize
 {
   // Provide a light sanitazion on the constructor input, as this is of general use
