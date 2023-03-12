@@ -1,20 +1,23 @@
 const Sanitize = require('../../classes/sanitize')
-const sanitize = new Sanitize.Sanitize()
 
 module.exports = function(app, db) {
-  
+  const sanitize = new Sanitize.Sanitize()
+
   /* Get all users from the database */
   app.get('/users', (req, res) => {
     db.read('persons', '*', res)
   })
 
-  /* Example - keep comments */
+  /* Get a user from the database */
+  app.get('/user/:id', (req, res) => {
+    
+  })
+
   /**
    * Insert an entry to the database
    */
   app.post('/user/add', (req, res) => {
-    // Local variables
-    const _database = {table: "Persons", values: ''}
+    const _database = {table: "Persons", values: '', elements: ''}
 
     // Sanitize each input
     for (const element in req.query) {
@@ -24,10 +27,20 @@ module.exports = function(app, db) {
       if(req.query.case === search ) 
       */
       _database.values += sanitize.input(req.query[element], Sanitize.input_case.input) + ','
+      _database.elements += sanitize.input(element, Sanitize.input_case.input) + ','
     }
 
-    // Remove the last comma
-    _database.values = _database.values.slice(0, -1)
+    _database.values = _database.values.slice(0, -1)  // Remove last comma
+    _database.elements = _database.elements.slice(0, -1)  // Remove last comma
+
+    /* TODO: Check if user exists and abort if true
+    try {
+      let res = db.read(_database.table, '_database.elements', '_database.values')  // TODO: Expand read method
+      if (res == 1) {
+        console.error('user already exist')
+      }
+    } catch(err) { console.log('something went wrong')} 
+    */
     
     // console.log(db.write(_database.table, clean_input))
     res.send(_database.values)
