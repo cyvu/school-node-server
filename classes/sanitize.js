@@ -17,14 +17,14 @@ class Sanitize
   }
 
   // Handle default inputs
-  default(text, input_case_arg) {
+  default(text, input_case_arg, callback) {
     let res = ''
     switch(input_case_arg) {
       case input_case.input: 
-        res = text.replace(/[^a-z0-9åäö_-]/gim, "");
+        res = text.replace(/[^a-z0-9åäö_ "@\.-]/gim, "");
       break;
       case input_case.textarea: 
-        res = text.replace(/[^a-z0-9åäö \.,_-]/gim, "");
+        res = text.replace(/[^a-z0-9åäö_ "@\.,_-]/gim, "");
       break;
       default:
         console.error('Sanitize::input(default) - unknown argument provided')

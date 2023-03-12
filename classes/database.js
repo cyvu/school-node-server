@@ -37,7 +37,22 @@ class Database
     })
   }
 
-  /* TODO: clean on prod */
+  check({table, fields, values, callback}) {
+    try {
+      this.connection.query(
+        `SELECT COUNT(id) 
+        FROM ${table}
+        WHERE firstname = 'scarlet' AND lastname = 'Dragon' AND email = 'cash@mountain.stayaway'`
+        // WHERE (${fields}) = (${values})`
+        , (err, rows, fields) => {
+          if (err) throw err
+          if (rows) {
+            return rows.affectedRows
+          }
+      })
+    } catch(err) {console.error('couldn\' execute query: ' + err)}
+  }
+
   read({table, field, values, callback}) {
     // Get a user if values is not empty
     if (values) {
@@ -58,19 +73,22 @@ class Database
     }
   }
 
-  /* TODO: clean on prod */
-  write({table, values, callback}) {
-    this.connection.query(`INSERT INTO ${table} VALUES (${values})`, function (err, rows, fields) {
-      if (err) throw err
+  write({table, fields, values, callback}) {
+    this.connection.query(`
+    INSERT INTO ${table} (${fields}) VALUES (${values});`, function (err, rows, fields) {
+      if (err) {
+        if (err.errno = 1062) {
+          callback.req.flash("message", "Then entry already exist")
+          return callback.res.redirect('/')
+        } else throw err
+      }
       if (rows) {
         if (rows.affectedRows === 1)
-          return JSON.stringify( values, null, 2).concat(" added")
-          callback.send(JSON.stringify( values, null, 2).concat(" added"))
+          callback.res.send(JSON.stringify( values, null, 2).concat(" added"))
       }
     })
   }
   
-  /* TODO: clean on prod */
   delete({table, field, value, callback}) {
     this.connection.query(`DELETE FROM ${table} WHERE ${field}= "${value}"`, function (err, rows, fields) {
       if (err) throw err
@@ -81,15 +99,18 @@ class Database
     }) 
   }
   
-  /* TODO: clean on prod */
   update({table, field, fieldValue, conditionField, conditionValue, callback}) {
-    this.connection.query(`UPDATE ${table} SET ${field} = "${fieldValue}"  WHERE ${conditionField} = "${conditionValue}"`, function (err, rows, fields) {
-      if (err) throw err
-      if (rows) {
-        if (rows.affectedRows === 1)
-        callback.send(JSON.stringify( values, null, 2).concat(" updated"))
-        // process.stdout.write(JSON.stringify( rows ))
-      }
+    console.log(JSON.stringify( conditionValue, null, 2).concat(" updated"))
+    this.connection.query(
+      `UPDATE ${table} 
+      SET ${field} = "${fieldValue}" 
+      WHERE ${conditionField} = "${conditionValue}"`,
+      function (err, rows, fields) {
+        if (err) throw err
+        if (rows) {
+          if (rows.affectedRows === 1)
+          callback.send(JSON.stringify( values, null, 2).concat(" updated"))
+        }
     }) 
   }
 }

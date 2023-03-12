@@ -29,25 +29,15 @@ module.exports = function(app, db) {
       if(req.query.case === textarea ) 
       if(req.query.case === search ) 
       */
-      _database.values += sanitize.input(req.query[field], Sanitize.input_case.input) + ','
-      _database.fields += sanitize.input(field, Sanitize.input_case.input) + ','
-      console.log(_database.values)
-      console.log(_database.fields)
+      _database.values += sanitize.default('\"' + req.query[field] + '\"', Sanitize.input_case.input) + ','
+      _database.fields += sanitize.default(field, Sanitize.input_case.input) + ','
     }
 
     _database.values = _database.values.slice(0, -1)  // Remove last comma
     _database.fields = _database.fields.slice(0, -1)  // Remove last comma
 
-    /* TODO: Check if user exists and abort if true
-    try {
-      let res = db.read(_database.table, '_database.elements', '_database.values')  // TODO: Expand read method
-      if (res == 1) {
-        console.error('user already exist')
-      }
-    } catch(err) { console.log('something went wrong')} 
-    */
-    
-    db.write({table: _database.table, values: _database.values, callback: res})
+    /* TODO: Check if user exists and abort if true */
+    db.write({table: _database.table, fields: _database.fields, values: _database.values, callback: {req, res}})
   })
 }
 
