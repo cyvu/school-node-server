@@ -32,7 +32,7 @@ class Database
     return true
   }
 
-  describe(table) {
+  describe({table}) {
     this.connection.query(`DESCRIBE ${table}`, (err, rows, fields) => {
       /* process.stdout.write("".concat(
         "\nDatabase.\x1B[3;32m", 
@@ -44,7 +44,7 @@ class Database
   }
 
   /* TODO: clean on prod */
-  read(table, field, callback) {
+  read({table, field, values, callback}) {
     this.connection.query(`SELECT ${field} FROM ${table}`, (err, rows, fields) => {
       if (err) throw err
       if (rows) {
@@ -55,7 +55,7 @@ class Database
   }
 
   /* TODO: clean on prod */
-  write(table, values, callback) {
+  write({table, values, callback}) {
     this.connection.query(`INSERT INTO ${table} VALUES (${values})`, function (err, rows, fields) {
       if (err) throw err
       if (rows) {
@@ -68,7 +68,7 @@ class Database
   }
   
   /* TODO: clean on prod */
-  delete(table, field, value, callback) {
+  delete({table, field, value, callback}) {
     this.connection.query(`DELETE FROM ${table} WHERE ${field}= "${value}"`, function (err, rows, fields) {
       if (err) throw err
       if (rows) {
@@ -80,7 +80,7 @@ class Database
   }
   
   /* TODO: clean on prod */
-  update(table, field, fieldValue, conditionField, conditionValue, callback) {
+  update({table, field, fieldValue, conditionField, conditionValue, callback}) {
     this.connection.query(`UPDATE ${table} SET ${field} = "${fieldValue}"  WHERE ${conditionField} = "${conditionValue}"`, function (err, rows, fields) {
       if (err) throw err
       if (rows) {
