@@ -93,13 +93,3 @@ class Database
 }
 
 module.exports = Database
-/*
-const db = new Database()
-db.isConnected()
-db.write('persons', `2, "Spring", "Blixted", "Some gata 1", "Höteborg"`)
-db.read('persons', 'LastName')
-db.delete('persons', 'LastName', 'Spring')
-db.read('persons', 'LastName')
-db.describe('persons')
-db.closeConnection()
-*/
