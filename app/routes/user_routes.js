@@ -5,33 +5,38 @@ module.exports = function(app, db) {
 
   /* Get all users from the database */
   app.get('/users', (req, res) => {
-    db.read('persons', '*', res)
+    const _database = {table: "users", fields: '*', values: ''}
+    db.read({table: _database.table, field: _database.fields, callback: res})
   })
 
   /* Get a user from the database */
   app.get('/user/:id', (req, res) => {
-    
+    const _database = {table: "users", fields: 'id', values: ''}
+    _database.values += sanitize.default(req.params.id, Sanitize.input_case.input)
+    db.read({table: _database.table, field: _database.fields, values: _database.values, callback: res})
   })
 
   /**
    * Insert an entry to the database
    */
   app.post('/user/add', (req, res) => {
-    const _database = {table: "Persons", values: '', elements: ''}
+    const _database = {table: "users", fields: '', values: ''}
 
     // Sanitize each input
-    for (const element in req.query) {
+    for (const field in req.query) {
       /* TODO Deal with different input cases (input, textarea)
       if(req.query.case === input ) 
       if(req.query.case === textarea ) 
       if(req.query.case === search ) 
       */
-      _database.values += sanitize.input(req.query[element], Sanitize.input_case.input) + ','
-      _database.elements += sanitize.input(element, Sanitize.input_case.input) + ','
+      _database.values += sanitize.input(req.query[field], Sanitize.input_case.input) + ','
+      _database.fields += sanitize.input(field, Sanitize.input_case.input) + ','
+      console.log(_database.values)
+      console.log(_database.fields)
     }
 
     _database.values = _database.values.slice(0, -1)  // Remove last comma
-    _database.elements = _database.elements.slice(0, -1)  // Remove last comma
+    _database.fields = _database.fields.slice(0, -1)  // Remove last comma
 
     /* TODO: Check if user exists and abort if true
     try {
@@ -42,8 +47,7 @@ module.exports = function(app, db) {
     } catch(err) { console.log('something went wrong')} 
     */
     
-    // console.log(db.write(_database.table, clean_input))
-    res.send(_database.values)
+    db.write({table: _database.table, values: _database.values, callback: res})
   })
 }
 

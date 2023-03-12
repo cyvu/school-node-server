@@ -16,8 +16,8 @@ class Sanitize
     
   }
 
-  // Handle user inputs
-  input(text, input_case_arg) {
+  // Handle default inputs
+  default(text, input_case_arg) {
     let res = ''
     switch(input_case_arg) {
       case input_case.input: 
@@ -31,6 +31,11 @@ class Sanitize
       break;
     }
     return res.trim();
+  }
+
+  // Handle user inputs
+  input(text, input_case_arg) {
+    this.default(text, input_case_arg)
   }
 
   // Replace html-characters with html-codes ('<' = '&lt;')

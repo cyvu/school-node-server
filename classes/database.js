@@ -34,24 +34,28 @@ class Database
 
   describe({table}) {
     this.connection.query(`DESCRIBE ${table}`, (err, rows, fields) => {
-      /* process.stdout.write("".concat(
-        "\nDatabase.\x1B[3;32m", 
-        "describe",
-        "\x1B[0;22m (", table, "):\n",
-        JSON.stringify( rows, null, 2))
-      )*/
     })
   }
 
   /* TODO: clean on prod */
   read({table, field, values, callback}) {
-    this.connection.query(`SELECT ${field} FROM ${table}`, (err, rows, fields) => {
-      if (err) throw err
-      if (rows) {
-        callback.send(rows)
-      // process.stdout.write("".concat("\nDatabase.\x1B[3;34m", "read", "\x1B[0;22m (", field, "):\n", JSON.stringify( rows, null, 2)))
-      }
-    })
+    // Get a user if values is not empty
+    if (values) {
+      this.connection.query(`SELECT * FROM ${table} WHERE ${field} = ${values}`, (err, rows, fields) => {
+        if (err) throw err
+        if (rows) {
+          callback.send(rows)
+        }
+      })
+    } else {
+      // Get all users if values is empty
+      this.connection.query(`SELECT ${field} FROM ${table}`, (err, rows, fields) => {
+        if (err) throw err
+        if (rows) {
+          callback.send(rows)
+        }
+      })
+    }
   }
 
   /* TODO: clean on prod */
@@ -62,7 +66,6 @@ class Database
         if (rows.affectedRows === 1)
           return JSON.stringify( values, null, 2).concat(" added")
           callback.send(JSON.stringify( values, null, 2).concat(" added"))
-          // process.stdout.write("".concat("\nDatabase.\x1B[3;35m", "write", "\x1B[0;2m (", "\"", values, "\") into \x1B[7;24m ", table, " \x1B[27m" ))
       }
     })
   }
@@ -74,7 +77,6 @@ class Database
       if (rows) {
           if (rows.affectedRows === 1)
           callback.send(JSON.stringify( values, null, 2).concat(" deleted"))
-          // process.stdout.write("".concat("\nDatabase.\x1B[3;31m" , "delete", "\x1B[0;2m (", field, "): \x1B[0;31m\"\x1B[9;31m", value, "\x1B[0;2m\x1B[0;31m\"\x1B[0;2m"))
       }
     }) 
   }
