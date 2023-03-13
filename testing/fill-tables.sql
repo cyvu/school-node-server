@@ -1,6 +1,13 @@
 INSERT INTO Users VALUES (
-  "Bengt",
-  "Bengan",
-  "bengtsson@pri.com",
+  "Cyvu",
+  "leetCoder",
+  "placeholder@a.b",
+  CURRENT_TIMESTAMP()
+)
+
+INSERT INTO Users VALUES (
+  "Xokketeer",
+  "toBeLeet",
+  "placeholder@b.a",
   CURRENT_TIMESTAMP()
 )

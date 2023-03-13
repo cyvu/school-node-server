@@ -1,5 +1,5 @@
-//import { mysql_user, mysql_pass, mysql_db } from '/env/credentials.js';
-import * as Database from "js/classes/database.mjs"
+//import * as env from '../\.env';
+import { Database } from "../database.mjs"
 
 
 
