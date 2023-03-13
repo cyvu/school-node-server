@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "baseUrl": ".",
+  "paths": {
+    "classes/*": "classes/*",
+    "sql/*": "sql/statemenets/*"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "npm [run express]",

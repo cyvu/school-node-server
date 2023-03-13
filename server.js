@@ -1,6 +1,6 @@
 const bodyParser = require('body-parser')
 const express = require('express')
-const MongoClient = require('mongodb').MongoClient
+// const MongoClient = require('mongodb').MongoClient
 const Database = require('./classes/database')
 // const db = require('./config/db')   // TODO keep?
 
