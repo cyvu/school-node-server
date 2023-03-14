@@ -1,4 +1,4 @@
-const input_case = {
+const type = {
   input: 'input',
   textarea: 'textarea',
 }
@@ -17,32 +17,33 @@ class Sanitize
   }
 
   // Handle default inputs
-  default(text, input_case_arg, callback) {
+  default(text, arg, callback) {
     let res = ''
-    switch(input_case_arg) {
-      case input_case.input: 
+    switch(arg) {
+      case type.input: 
         res = text.replace(/[^a-z0-9åäö_ "@\.-]/gim, "");
       break;
-      case input_case.textarea: 
+      case type.textarea: 
         res = text.replace(/[^a-z0-9åäö_ "@\.,_-]/gim, "");
       break;
       default:
-        console.error('Sanitize::input(default) - unknown argument provided')
+        console.error('Sanitize::default() - unknown argument provided')
       break;
     }
     return res.trim();
   }
 
   // Handle user inputs
-  input(text, input_case_arg) {
-    this.default(text, input_case_arg)
+  input(text, arg) {
+    return this.default(text, arg)
   }
 
   // Replace html-characters with html-codes ('<' = '&lt;')
-  html() {}
+  html() {
+  }
 }
 
 module.exports = {
-  input_case,
+  type,
   Sanitize,
 }
