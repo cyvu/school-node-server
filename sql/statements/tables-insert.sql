@@ -2,13 +2,13 @@ INSERT INTO Users (firstname, lastname, email, last_logged_in)
 VALUES (
   "Cyvu",
   "leetCoder",
-  "placeholder@a.b",-
-)
-
+  "placeholder@a.b",
+  CURRENT_TIMESTAMP()
+);
 INSERT INTO Users (firstname, lastname, email, last_logged_in)
 VALUES (
   "Xokketeer",
-  "toBeLeet",
+  "toBeLeetCoder",
   "placeholder@b.a",
   CURRENT_TIMESTAMP()
-)
+);
