@@ -3,13 +3,31 @@
 const mysql = require("mysql");
 
 class Database {
-  constructor() {
+  constructor(multipleStatements=false) {
     this.connection = mysql.createConnection({
       host: "localhost",
       user: "root",
       password: "password",
       database: "school",
+      multipleStatements: multipleStatements
     });
+  }
+
+  /** Only for server-sided queries; vulnerable */
+  run(safe_query) {
+    let msg = "";
+    const query = this.connection.query(safe_query);
+    query
+      .on("error", function (err) {
+        if (err.errno == 1062) msg = "Duplicates are not allowed: " + _values;
+        else throw err;
+      })
+      .on("fields", function (fields) {})
+      .on("result", function (row) {
+        console.log(JSON.stringify(row, null, 2));
+      })
+      .on("end", function () {
+      });
   }
 
   isConnected() {
@@ -51,9 +69,8 @@ class Database {
     );
     query
       .on("error", function (err) {
-        if (err.errno == 1062)
-          msg = "Duplicates are not allowed: " + _values;
-        else throw err
+        if (err.errno == 1062) msg = "Duplicates are not allowed: " + _values;
+        else throw err;
       })
       .on("fields", function (fields) {
         console.log("fields: ", fields);
@@ -70,7 +87,7 @@ class Database {
         */
       })
       .on("end", function () {
-        console.log(msg)
+        console.log(msg);
         callback.res.send(msg);
       });
   }
