@@ -1,3 +1,4 @@
+"use strict";
 //import { mysql_user, mysql_pass, mysql_db } from '/env/credentials.js';
 const mysql = require("mysql");
 
@@ -43,21 +44,35 @@ class Database {
     const _values = values
       .reduce((accu, currentValue) => accu + '"' + currentValue + '",', "")
       .slice(0, -1);
+    console.log(`INSERT INTO ${table} (${_fields}) VALUES (${_values})`);
 
-    this.connection.query(`
-    INSERT INTO ${table} (${_fields}) VALUES (${_values})`),
-      function (err, rows, fields) {
-          throw err;
-          if (err) {
-          if (err.errno == 1062) throw "Duplicates are not allowed: " + _values;
-          Router.push({path: '/'})
-        }
-        if (rows) {
-          if (rows.affectedRows === 1)
-            msg = JSON.stringify(_values, null, 2).concat(" added");
-        } else msg = "User(" + _values + ") already exist";
+    const query = this.connection.query(
+      `INSERT INTO ${table} (${_fields}) VALUES (${_values})`
+    );
+    query
+      .on("error", function (err) {
+        if (err.errno == 1062)
+          msg = "Duplicates are not allowed: " + _values;
+        else throw err
+      })
+      .on("fields", function (fields) {
+        console.log("fields: ", fields);
+      })
+      .on("result", function (row) {
+        console.log("row: ", row);
+        if (row.affectedRows === 1)
+          msg = JSON.stringify(_values, null, 2).concat(" added");
+        /* Use with I/O
+        this.connection.pause();
+        processRow(row, function () {
+          this.connection.resume()
+        });
+        */
+      })
+      .on("end", function () {
+        console.log(msg)
         callback.res.send(msg);
-      };
+      });
   }
 
   read({ table, field, values, amount, start, callback }) {
