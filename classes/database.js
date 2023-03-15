@@ -9,7 +9,7 @@ class Database {
       user: "root",
       password: "password",
       database: "school",
-      multipleStatements: true
+      multipleStatements: multipleStatements
     });
   }
 
