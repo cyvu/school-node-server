@@ -24,14 +24,12 @@ if (db.isConnected()) {
   require("./app/routes")(app, db);
 } else console.error("db not connected");
 
-const corsOptions = {
+app.use(cors({
   "origin": "*",
-  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-  "preflightContinue": false,
-  "optionsSuccessStatus": 204
-};
-
-app.use(cors(corsOptions));
+  "methods": ['GET'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 600
+}))
 
 app.listen(port, () => {
   console.log("We are live on " + port);

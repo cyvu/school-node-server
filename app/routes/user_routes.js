@@ -195,7 +195,8 @@ module.exports = function (app, db) {
       field: _database.fields,
       callback: { req, res },
     });
-  });
+    
+  })
   app.post("/users", (req, res) => {
     const _database = { table: "users", fields: "*", values: "" };
     db.read({

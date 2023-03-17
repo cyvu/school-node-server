@@ -122,7 +122,7 @@ class Database {
         (err, rows, fields) => {
           if (err) throw err;
           if (rows) {
-            callback.res.send(rows);
+            callback.res.send(JSON.stringify(rows));
           }
         }
       );
