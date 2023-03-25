@@ -1,16 +1,11 @@
 "use strict";
 //import { mysql_user, mysql_pass, mysql_db } from '/env/credentials.js';
-const mysql = require("mysql");
+const mysql = require("mysql2");
 
 class Database {
-  constructor(multipleStatements=false) {
-    this.connection = mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "password",
-      database: "school",
-      multipleStatements: multipleStatements
-    });
+  constructor(multipleStatements = false) {
+    this.multipleStatements = multipleStatements;
+    this.connected = false;
   }
 
   /** Only for server-sided queries; vulnerable */
@@ -26,35 +21,44 @@ class Database {
       .on("result", function (row) {
         console.log(JSON.stringify(row, null, 2));
       })
-      .on("end", function () {
-      });
+      .on("end", function () {});
+  }
+
+  connect() {
+    this.connection = mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "password",
+      database: "school",
+      multipleStatements: this.multipleStatements,
+    });
+
+    this.connection.connect((err) => {
+      if (err) throw new Error(err.stack);
+      return (this.connected = true);
+    });
+  }
+
+  end() {
+    this.connection.end((err) => {
+      if (err) throw new Error(err.stack);
+      return (this.connected = false);
+    });
   }
 
   isConnected() {
-    this.connection.connect((err) => {
-      if (err) {
-        console.error("error during connection", err.stack);
-        return false;
-      }
-    });
-    return true;
-  }
-
-  closeConnection() {
-    this.connection.end((err) => {
-      if (err) {
-        console.error("error during disconnection", err.stack);
-        return false;
-      }
-    });
-    return true;
+    return this.connected;
   }
 
   describe({ table }) {
+    this.connect();
     this.connection.query(`DESCRIBE ${table}`, (err, rows, fields) => {});
+    this.end();
   }
 
   write({ table, fields, values, callback }) {
+    this.connect();
+
     let msg = "";
     const _fields = fields
       .reduce((accu, currentValue) => accu + currentValue + ",", "")
@@ -62,7 +66,6 @@ class Database {
     const _values = values
       .reduce((accu, currentValue) => accu + '"' + currentValue + '",', "")
       .slice(0, -1);
-    console.log(`INSERT INTO ${table} (${_fields}) VALUES (${_values})`);
 
     const query = this.connection.query(
       `INSERT INTO ${table} (${_fields}) VALUES (${_values})`
@@ -72,11 +75,8 @@ class Database {
         if (err.errno == 1062) msg = "Duplicates are not allowed: " + _values;
         else throw err;
       })
-      .on("fields", function (fields) {
-        console.log("fields: ", fields);
-      })
+      .on("fields", function (fields) {})
       .on("result", function (row) {
-        console.log("row: ", row);
         if (row.affectedRows === 1)
           msg = JSON.stringify(_values, null, 2).concat(" added");
         /* Use with I/O
@@ -87,20 +87,30 @@ class Database {
         */
       })
       .on("end", function () {
-        console.log(msg);
         callback.res.send(msg);
       });
+    this.end();
   }
 
   read({ table, field, values, amount, start, callback }) {
+    this.connect();
+
     if (values) {
       // Get a user by value
       this.connection.query(
         `SELECT * FROM ${table} WHERE ${field} = ${values}`,
         (err, rows, fields) => {
-          if (err) throw err;
+          if (err) {
+            res.writeHead(500, { "Content-Type": "text/plain" });
+            res.end("Error occurred while fetching data from MySQL database");
+            return;
+          }
           if (rows) {
-            callback.res.send(rows);
+            // Send the MySQL response as a JSON object in response to a fetch request
+            // res.writeHead(200, { "Content-Type": "application/json" });
+            // res.end(JSON.stringify(rows));
+
+            callback.res.status(200).json(rows);
           }
         }
       );
@@ -120,16 +130,29 @@ class Database {
       this.connection.query(
         `SELECT ${field} FROM ${table}`,
         (err, rows, fields) => {
-          if (err) throw err;
+          if (err) {
+            callback.res.writeHead(500, { "Content-Type": "text/plain" });
+            callback.res.end(
+              "Error occurred while fetching data from MySQL database"
+            );
+            return;
+          }
           if (rows) {
-            callback.res.send(rows);
+            // Send the MySQL response as a JSON object in response to a fetch request
+            // res.writeHead(200, { "Content-Type": "application/json" });
+            // res.end(JSON.stringify(rows));
+
+            // callback.res.writeHead(200, { "Content-Type": "application/json" });
+            callback.res.status(200).json(rows);
           }
         }
       );
     }
+    this.end();
   }
 
   update({ table, id, fields, values, callback }) {
+    this.connect();
     this.connection.query(
       `UPDATE ${table} 
       SET ${fields} = "${values}" 
@@ -143,9 +166,11 @@ class Database {
         callback.res.send(msg);
       }
     );
+    this.end();
   }
 
   delete({ table, field, value, callback }) {
+    this.connect();
     // TODO: Ask for confirmation
     // TODO: set user as inactive instead?
     let msg = "";
@@ -160,6 +185,7 @@ class Database {
         callback.res.send(msg);
       }
     );
+    this.end();
   }
 }
 
