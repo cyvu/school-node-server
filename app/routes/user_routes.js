@@ -9,134 +9,77 @@ module.exports = function (app, db) {
   /**
    *  Create
    */
-  app
-    .route("/user/add")
-    .get((req, res) => {
-      const _database = {
-        table: "users",
-        fields: [],
-        values: [],
-      };
+  app.route("/user/add").post((req, res) => {
+    const _database = {
+      table: "users",
+      fields: [],
+      values: [],
+    };
 
-      for (const field in req.query) {
-        _database.fields.push(sanitize.default(field, Sanitize.type.input));
-        _database.values.push(
-          sanitize.default(req.query[field], Sanitize.type.input)
-        );
-      }
+    if (!req.body) throw Error("query is empty");
 
-      db.write({
-        table: _database.table,
-        fields: _database.fields,
-        values: _database.values,
-        callback: { req, res },
-      });
-    })
-    .post((req, res) => {
-      const _database = {
-        table: "users",
-        fields: [],
-        values: [],
-      };
+    for (const field in req.body) {
+      _database.fields.push(sanitize.default(field, Sanitize.type.input));
+      _database.values.push(
+        sanitize.default(req.body[field], Sanitize.type.input)
+      );
+    }
 
-      for (const field in req.query) {
-        _database.fields.push(sanitize.default(field, Sanitize.type.input));
-        _database.values.push(
-          sanitize.default(req.query[field], Sanitize.type.input)
-        );
-      }
-
-      db.write({
-        table: _database.table,
-        fields: _database.fields,
-        values: _database.values,
-        callback: { req, res },
-      });
+    db.write({
+      table: _database.table,
+      fields: _database.fields,
+      values: _database.values,
+      callback: { req, res },
     });
+  });
 
   /**
    *  Update
    */
-  app
-    .route("/user/:id/update")
-    .get((req, res) => {
-      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
-      const _database = { table: "users", id: "", fields: "", values: "" };
+  app.route("/user/:id/update").post((req, res) => {
+    if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
+    const _database = {
+      table: "users",
+      id: undefined,
+      fields: [],
+      values: [],
+    };
 
-      _database.id = sanitize.default(req.params.id, Sanitize.type.input);
+    _database.id = sanitize.default(req.params.id, Sanitize.type.input);
 
-      for (const field in req.query) {
-        _database.fields += sanitize.default(field, Sanitize.type.input);
-        _database.values += sanitize.default(
-          req.query[field],
-          Sanitize.type.input
-        );
-      }
+    for (const field in req.body) {
+      _database.fields.push(sanitize.default(field, Sanitize.type.input));
+      _database.values.push(
+        sanitize.default(req.body[field], Sanitize.type.input)
+      );
+    }
 
-      db.update({
-        table: _database.table,
-        id: _database.id,
-        fields: _database.fields,
-        values: _database.values,
-        callback: { req, res },
-      });
-    })
-    .post((req, res) => {
-      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
-      const _database = { table: "users", id: "", fields: "", values: "" };
-
-      _database.id = sanitize.default(req.params.id, Sanitize.type.input);
-
-      for (const field in req.query) {
-        _database.fields += sanitize.default(field, Sanitize.type.input);
-        _database.values += sanitize.default(
-          req.query[field],
-          Sanitize.type.input
-        );
-      }
-
-      db.update({
-        table: _database.table,
-        id: _database.id,
-        fields: _database.fields,
-        values: _database.values,
-        callback: { req, res },
-      });
+    db.update({
+      table: _database.table,
+      id: _database.id,
+      fields: _database.fields,
+      values: _database.values,
+      callback: { req, res },
     });
+  });
 
   /**
    * Delete
    */
-  app
-    .route("/user/:id/delete")
-    .get((req, res) => {
-      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
+  app.route("/user/:id/delete").post((req, res) => {
+    if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
 
-      const _database = { table: "users", field: "id", value: "" };
+    const _database = { table: "users", field: "id", value: "" };
 
-      _database.value += sanitize.default(req.params.id, Sanitize.type.input);
+    _database.value += sanitize.default(req.params.id, Sanitize.type.input);
 
-      db.delete({
-        table: _database.table,
-        field: _database.field,
-        value: _database.value,
-        callback: { req, res },
-      });
-    })
-    .post((req, res) => {
-      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
-
-      const _database = { table: "users", field: "id", value: "" };
-
-      _database.value += sanitize.default(req.params.id, Sanitize.type.input);
-
-      db.delete({
-        table: _database.table,
-        field: _database.field,
-        value: _database.value,
-        callback: { req, res },
-      });
+    db.delete({
+      table: _database.table,
+      field: _database.field,
+      value: _database.value,
+      callback: { req, res },
     });
+  });
 
   /**
    * Read

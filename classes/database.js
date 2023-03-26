@@ -79,12 +79,6 @@ class Database {
       .on("result", function (row) {
         if (row.affectedRows === 1)
           msg = JSON.stringify(_values, null, 2).concat(" added");
-        /* Use with I/O
-        this.connection.pause();
-        processRow(row, function () {
-          this.connection.resume()
-        });
-        */
       })
       .on("end", function () {
         callback.res.send(msg);
@@ -152,21 +146,30 @@ class Database {
   }
 
   update({ table, id, fields, values, callback }) {
-    this.connect();
-    this.connection.query(
-      `UPDATE ${table} 
-      SET ${fields} = "${values}" 
+
+    let msg = "";
+
+    // TODO update only changed values
+
+    for (const entry in fields) {
+      this.connect();
+
+      this.connection.query(
+        `UPDATE ${table} 
+      SET ${fields[entry]} = "${values[entry]}" 
       WHERE id = "${id}"`,
-      function (err, rows, fields) {
-        if (err) throw err;
-        if (rows) {
-          if (rows.affectedRows === 1)
-            msg = JSON.stringify(value, null, 2).concat(" updated");
-        } else msg = "No user by that id(" + id + ")";
-        callback.res.send(msg);
-      }
-    );
-    this.end();
+        function (err, rows, fields) {
+          if (err) throw err;
+          if (rows) {
+            if (rows.affectedRows === 1)
+              msg += JSON.stringify(values[entry], null, 2).concat(" updated");
+          } else msg = "No user by that id(" + id + ")";
+        }
+      );
+      
+      this.end();
+    }
+    callback.res.send(msg);
   }
 
   delete({ table, field, value, callback }) {
