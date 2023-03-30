@@ -10,6 +10,10 @@ class Database {
 
   /** Only for server-sided queries; vulnerable */
   run(safe_query) {
+    // TODO prepared statements
+    // TODO stored procedures
+    // TODO transactions
+    // TODO error handling
     let msg = "";
     const query = this.connection.query(safe_query);
     query
@@ -57,6 +61,10 @@ class Database {
   }
 
   write({ table, fields, values, callback }) {
+    // TODO prepared statements
+    // TODO stored procedures
+    // TODO transactions
+    // TODO error handling
     this.connect();
 
     let msg = "";
@@ -87,6 +95,10 @@ class Database {
   }
 
   read({ table, field, values, amount, start, callback }) {
+    // TODO prepared statements
+    // TODO stored procedures
+    // TODO transactions
+    // TODO error handling
     this.connect();
 
     if (values) {
@@ -146,36 +158,56 @@ class Database {
   }
 
   update({ table, id, fields, values, callback }) {
-
     let msg = "";
 
-    // TODO update only changed values
+    // TODO compare to user, change only new values
+    // TODO prepared statements
+    // TODO stored procedures
+    // TODO transactions
+    // TODO error handling
 
+    // Makeshift until the above has been implemented
+    const newFields = [];
     for (const entry in fields) {
+      if (fields[entry] === "email") newFields.unshift(entry);
+      else newFields.push(entry);
+    }
+
+    for (const entry in newFields) {
       this.connect();
 
-      this.connection.query(
+      const query = this.connection.query(
         `UPDATE ${table} 
       SET ${fields[entry]} = "${values[entry]}" 
-      WHERE id = "${id}"`,
-        function (err, rows, fields) {
-          if (err) throw err;
-          if (rows) {
-            if (rows.affectedRows === 1)
-              msg += JSON.stringify(values[entry], null, 2).concat(" updated");
-          } else msg = "No user by that id(" + id + ")";
-        }
+      WHERE id = "${id}"`
       );
-      
+
+      query
+        .on("error", function (err) {
+          if (err.code === "ER_DUP_ENTRY")
+            msg += "Duplicates are not allowed: " + values[entry];
+          else throw err;
+        })
+        .on("fields", function (fields) {})
+        .on("result", function (row) {
+          if (row.affectedRows === 1)
+            msg += values[entry] + " updated";
+          })
+        .on("end", function () {});
+
       this.end();
     }
-    callback.res.send(msg);
+    callback.res.json(JSON.stringify(msg), null, 2);
   }
 
   delete({ table, field, value, callback }) {
     this.connect();
-    // TODO: Ask for confirmation
-    // TODO: set user as inactive instead?
+    // TODO prepared statements
+    // TODO stored procedures
+    // TODO transactions
+    // TODO error handling
+    // TODO ask for confirmation
+    // TODO set user as inactive instead?
     let msg = "";
     this.connection.query(
       `DELETE FROM ${table} WHERE ${field}= "${value}"`,
