@@ -13,10 +13,7 @@
     "run": "npm [run express]",
     "db:test": "node .\\testing\\db-script.mjs",
     "dev": "nodemon server.js",
-    "database:drop": "node .\\sql\\scripts.js drop",
-    "database:create": "node .\\sql\\scripts.js create",
-    "database:insert": "node .\\sql\\scripts.js insert",
-    "database:truncate": "node .\\sql\\scripts.js truncate",
+    "database:dummy:users": "node .\\sql\\scripts.js dummy users",
     "database:reset": "node .\\sql\\scripts.js reset"
   },
   "repository": {
