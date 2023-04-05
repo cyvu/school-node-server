@@ -9,23 +9,26 @@ class Database {
   }
 
   /** Only for server-sided queries; vulnerable */
-  run(safe_query) {
-    // TODO prepared statements
-    // TODO stored procedures
-    // TODO transactions
-    // TODO error handling
-    let msg = "";
-    const query = this.connection.query(safe_query);
-    query
-      .on("error", function (err) {
-        if (err.errno == 1062) msg = "Duplicates are not allowed: " + _values;
-        else throw err;
-      })
-      .on("fields", function (fields) {})
-      .on("result", function (row) {
-        console.log(JSON.stringify(row, null, 2));
-      })
-      .on("end", function () {});
+  query(query) {
+    return new Promise((resolve, reject) => {
+      const results = [];
+      console.log(query);
+      const _query = this.connection.query(query);
+      _query
+        .on("error", (err) => {
+          reject(new Error(`Query error: ${err.message}`));
+        })
+        .on("result", (row) => {
+          if (row.affectedRows === 1) {
+            results.push(JSON.stringify(row, null, 2));
+          } else {
+            results.push(JSON.stringify("no rows affected", null, 2));
+          }
+        })
+        .on("end", () => {
+          resolve(results);
+        });
+    });
   }
 
   connect() {
@@ -190,9 +193,8 @@ class Database {
         })
         .on("fields", function (fields) {})
         .on("result", function (row) {
-          if (row.affectedRows === 1)
-            msg += values[entry] + " updated";
-          })
+          if (row.affectedRows === 1) msg += values[entry] + " updated";
+        })
         .on("end", function () {});
 
       this.end();
@@ -221,6 +223,18 @@ class Database {
       }
     );
     this.end();
+  }
+
+  /**
+   * Call a (mysql) stored procedure by its name and any argument required, as an array
+   * @param {string} procedure
+   * @param  {Array<number | string>} args
+   */
+  call(procedure, ...args) {
+    if (args.length === 1 && Array.isArray(args[0])) {
+      args = args[0]; // flatten the array if it contains only one element
+    }
+    this.query(`CALL ${procedure}(${args.join(", ")})`);
   }
 }
 

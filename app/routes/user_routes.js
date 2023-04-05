@@ -24,13 +24,14 @@ module.exports = function (app, db) {
         sanitize.default(req.body[field], Sanitize.type.input)
       );
     }
-
+/*
     db.write({
       table: _database.table,
       fields: _database.fields,
       values: _database.values,
       callback: { req, res },
     });
+    */
   });
 
   /**
@@ -133,6 +134,8 @@ module.exports = function (app, db) {
   /* Get all users from the database */
   app.get("/users", (req, res) => {
     const _database = { table: "users", fields: "*", values: "" };
+    db.call("sp_userRead", [0, 5])
+    
     db.read({
       table: _database.table,
       field: _database.fields,

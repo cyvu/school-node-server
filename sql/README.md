@@ -11,15 +11,15 @@ users
 Parameters with underline text indicates that the rest are optional
 
 ## CREATE
-- sp_userCreate (<i>username</i>, <i>firstname</i>, <i>lastname</i>, <i>email</i>)
+- <code>sp_userCreate</code> (<i>username</i>, <i>firstname</i>, <i>lastname</i>, <i>email</i>)
 
 ## READ
-- sp_usersRead (<i>index</i>, <i>limit</i>) -- Notice it's plural
-- sp_usersReadDefault (<i>index</i>)
-- sp_userRead (<i>index</i>, <i>limit</i>) -- Notice it's singular
+- <code>sp_usersRead</code> (<i>index</i>, <i>limit</i>) -- Notice it's plural
+- <code>sp_usersReadDefault</code> (<i>index</i>)
+- <code>sp_userRead</code> (<i>index</i>, <i>limit</i>) -- Notice it's singular
 
 ## UPDATE
-- sp_userUpdate (<i><u>id</u></i>, <i>username</i>, <i>firstname</i>, <i>lastname</i>, <i>email</i>)
+- <code>sp_userUpdate</code> (<i><u>id</u></i>, <i>username</i>, <i>firstname</i>, <i>lastname</i>, <i>email</i>)
 
 ## DELETE
-- sp_userDelete (<i>id</i>)
+- <code>sp_userDelete</code> (<i>id</i>)
