@@ -1,10 +1,10 @@
-const Sanitize = require("../../classes/sanitize");
+const Sanitize = require("../../classes/sanitize")
 
 // TODO: Implement with controller in the future
 // https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/routes
 
 module.exports = function (app, db) {
-  const sanitize = new Sanitize.Sanitize();
+  const sanitize = new Sanitize.Sanitize()
 
   /**
    *  Create
@@ -14,17 +14,17 @@ module.exports = function (app, db) {
       table: "users",
       fields: [],
       values: [],
-    };
+    }
 
-    if (!req.body) throw Error("query is empty");
+    if (!req.body) throw Error("query is empty")
 
     for (const field in req.body) {
-      _database.fields.push(sanitize.default(field, Sanitize.type.input));
+      _database.fields.push(sanitize.default(field, Sanitize.type.input))
       _database.values.push(
         sanitize.default(req.body[field], Sanitize.type.input)
-      );
+      )
     }
-/*
+    /*
     db.write({
       table: _database.table,
       fields: _database.fields,
@@ -32,27 +32,27 @@ module.exports = function (app, db) {
       callback: { req, res },
     });
     */
-  });
+  })
 
   /**
    *  Update
    */
   app.route("/user/:id/update").post((req, res) => {
-    if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
+    if (isNaN(req.params.id)) throw "Expected id of user after '/user/'"
     const _database = {
       table: "users",
       id: undefined,
       fields: [],
       values: [],
-    };
+    }
 
-    _database.id = sanitize.default(req.params.id, Sanitize.type.input);
+    _database.id = sanitize.default(req.params.id, Sanitize.type.input)
 
     for (const field in req.body) {
-      _database.fields.push(sanitize.default(field, Sanitize.type.input));
+      _database.fields.push(sanitize.default(field, Sanitize.type.input))
       _database.values.push(
         sanitize.default(req.body[field], Sanitize.type.input)
-      );
+      )
     }
 
     db.update({
@@ -61,26 +61,26 @@ module.exports = function (app, db) {
       fields: _database.fields,
       values: _database.values,
       callback: { req, res },
-    });
-  });
+    })
+  })
 
   /**
    * Delete
    */
   app.route("/user/:id/delete").post((req, res) => {
-    if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
+    if (isNaN(req.params.id)) throw "Expected id of user after '/user/'"
 
-    const _database = { table: "users", field: "id", value: "" };
+    const _database = { table: "users", field: "id", value: "" }
 
-    _database.value += sanitize.default(req.params.id, Sanitize.type.input);
+    _database.value += sanitize.default(req.params.id, Sanitize.type.input)
 
     db.delete({
       table: _database.table,
       field: _database.field,
       value: _database.value,
       callback: { req, res },
-    });
-  });
+    })
+  })
 
   /**
    * Read
@@ -88,39 +88,39 @@ module.exports = function (app, db) {
   app
     .route("/user/:id")
     .get((req, res) => {
-      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
-      const _database = { table: "users", fields: "id", values: "" };
-      _database.values += sanitize.default(req.params.id, Sanitize.type.input);
+      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'"
+      const _database = { table: "users", fields: "id", values: "" }
+      _database.values += sanitize.default(req.params.id, Sanitize.type.input)
       db.read({
         table: _database.table,
         field: _database.fields,
         values: _database.values,
         callback: { req, res },
-      });
+      })
     })
     .post((req, res) => {
-      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'";
-      const _database = { table: "users", fields: "id", values: "" };
-      _database.values += sanitize.default(req.params.id, Sanitize.type.input);
+      if (isNaN(req.params.id)) throw "Expected id of user after '/user/'"
+      const _database = { table: "users", fields: "id", values: "" }
+      _database.values += sanitize.default(req.params.id, Sanitize.type.input)
       db.read({
         table: _database.table,
         field: _database.fields,
         values: _database.values,
         callback: { req, res },
-      });
-    });
+      })
+    })
 
   /* Get all users from the database, by limit and position */
   app.get("/users/:amount/:start", (req, res) => {
     if (isNaN(req.params.amount))
-      throw "Expected amount of users after '/users/<amount>'";
+      throw "Expected amount of users after '/users/<amount>'"
     if (isNaN(req.params.start))
-      throw "Expected starting position after '/user/<amount>/<start>'";
+      throw "Expected starting position after '/user/<amount>/<start>'"
 
-    const _database = { table: "users", fields: "*", amount: 0, start: 0 };
+    const _database = { table: "users", fields: "*", amount: 0, start: 0 }
 
-    _database.amount = sanitize.default(req.params.amount, Sanitize.type.input);
-    _database.start = sanitize.default(req.params.start, Sanitize.type.input);
+    _database.amount = sanitize.default(req.params.amount, Sanitize.type.input)
+    _database.start = sanitize.default(req.params.start, Sanitize.type.input)
 
     db.read({
       table: _database.table,
@@ -128,26 +128,26 @@ module.exports = function (app, db) {
       amount: _database.amount,
       start: _database.start,
       callback: { req, res },
-    });
-  });
+    })
+  })
 
   /* Get all users from the database */
   app.get("/users", (req, res) => {
-    const _database = { table: "users", fields: "*", values: "" };
+    const _database = { table: "users", fields: "*", values: "" }
     db.call("sp_userRead", [0, 5])
-    
+
     db.read({
       table: _database.table,
       field: _database.fields,
       callback: { req, res },
-    });
-  });
+    })
+  })
   app.post("/users", (req, res) => {
-    const _database = { table: "users", fields: "*", values: "" };
+    const _database = { table: "users", fields: "*", values: "" }
     db.read({
       table: _database.table,
       field: _database.fields,
       callback: { req, res },
-    });
-  });
-};
+    })
+  })
+}

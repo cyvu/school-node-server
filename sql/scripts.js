@@ -1,9 +1,9 @@
 //import * as env from '../\.env';
-const fs = require("fs");
-const Database = require("../classes/database");
-const { CLIENT_RENEG_LIMIT } = require("tls");
+const fs = require("fs")
+const Database = require("../classes/database")
+const { CLIENT_RENEG_LIMIT } = require("tls")
 
-const base = __dirname + "/";
+const base = __dirname + "/"
 
 const database = {
   tables: {
@@ -25,11 +25,11 @@ const database = {
     path: "_dummy/",
     users: "users.sql",
   },
-};
+}
 
 function readFiles(filePath, cb) {
   try {
-    let data = "";
+    let data = ""
     const order = [
       database.tables.create,
       database.procedures.users.create,
@@ -37,25 +37,25 @@ function readFiles(filePath, cb) {
       database.procedures.users.update,
       database.procedures.users.delete,
       database.dummy.users,
-    ];
+    ]
     order.forEach((element) => {
       // data += fs.readFileSync(__dirname + element, "utf-8") + "\n";
-      console.log(base + element, "utf-8");
-    });
-    fetchQuery(data);
+      console.log(base + element, "utf-8")
+    })
+    fetchQuery(data)
   } catch (error) {
-    console.error(`Got an error trying to read the file: ${error.message}`);
+    console.error(`Got an error trying to read the file: ${error.message}`)
   }
 }
 
 async function fetchQuery(query) {
   try {
-    const db = new Database(true);
-    console.log(query);
-    db.run(query);
-    db.closeConnection();
+    const db = new Database(true)
+    console.log(query)
+    db.run(query)
+    db.closeConnection()
   } catch (error) {
-    console.error(`Got an error trying to read the file: ${error.message}`);
+    console.error(`Got an error trying to read the file: ${error.message}`)
   }
 }
 
@@ -65,10 +65,10 @@ if ("tables" === process.argv[2]) {
       database.dummy.path + database.dummy.users,
       "utf-8",
       (err, data) => {
-        if (err) return err;
-        console.log(data);
+        if (err) return err
+        console.log(data)
       }
-    );
+    )
   }
 }
 
@@ -78,10 +78,10 @@ if ("procedures" === process.argv[2]) {
       database.dummy.path + database.dummy.users,
       "utf-8",
       (err, data) => {
-        if (err) return err;
-        console.log(data);
+        if (err) return err
+        console.log(data)
       }
-    );
+    )
   }
 }
 
@@ -91,13 +91,13 @@ if ("dummy" === process.argv[2]) {
       database.dummy.path + database.dummy.users,
       "utf-8",
       (err, data) => {
-        if (err) return err;
-        console.log(data);
+        if (err) return err
+        console.log(data)
       }
-    );
+    )
   }
 }
 
 if ("reset" === process.argv[2]) {
-  readFiles(database);
+  readFiles(database)
 }
